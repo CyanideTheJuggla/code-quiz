@@ -142,7 +142,7 @@ const question = [
     }
 ];
 
-let currentHighScores;
+let currentHighScores = [];
 let correctAnswers = 0;
 let wrongAnswers = 0;
 let questionPosition = 0;
@@ -160,9 +160,11 @@ const generateHighScores = () => {
     }
     localStorage.setItem('High Scores', JSON.stringify(currentHighScores));
     currentHighScores = JSON.parse(localStorage.getItem('High Scores'));
+    currentHighScores.sort((a,b) => {return (b.score - a.score)}); //sort by high score
 };
 
 const populateHighScores = () => {
+    currentHighScores.sort((a,b) => {return (b.score - a.score)}); //sort by high score
     highScoreBox.html('');
     //add high score header
     const highScoreHeader = '<div class="row justify-content-center my-1 bg-light-gradient" id="highScoreHeader">'
@@ -186,6 +188,9 @@ const populateHighScores = () => {
             + '<div class="col-4 card p-5 align-self-center border-start-0" style="border-radius: 0 8px 8px 0;"> ' 
                 + score + '</div></div>'
         );
+    }
+    while(currentHighScores.length > 10){
+        currentHighScores.pop(); //remove lowest score(s) from top 10
     }
 };
 
@@ -237,24 +242,14 @@ const end = () => {
     binaryBox.removeClass('d-grid').addClass('d-none'); //hide true/false section
     multiBox.removeClass('d-grid').addClass('d-none'); //hide multiple choice section
     
-    currentHighScores.push({name: scoreCard.name, score: (scoreCard.score * scoreCard.timer).toFixed(2) }); // add score to high scores
-    currentHighScores.sort((a,b) => {  //sort by highest score
-        const tempA = Math.round(a.score);
-        const tempB = Math.round(b.score);
-        if(tempA > tempB) return -1;
-        else if(tempA < tempB) return 1;
-        else return 0;
-    });
-    while(currentHighScores.length > 10){
-        currentHighScores.pop(); //remove lowest score(s) from top 10
-    }
+    // add player score to high scores
+    currentHighScores.push({name: scoreCard.name, score: (scoreCard.score * scoreCard.timer).toFixed(2) }); 
+    populateHighScores();
 
     const newHighScores = JSON.stringify(currentHighScores);
     localStorage.setItem('High Scores', newHighScores); // store new high scores
 
-    populateHighScores();
-
-    $('#scoreDisplay').html("Points: " + scoreCard.score + '<br/>Time: ' + scoreCard.timer.toFixed(1)  //set player stats
+    $('#scoreDisplay').html("Points: " + scoreCard.score + '<br/>Time: ' + scoreCard.timer.toFixed(1)  //set player stat display
         + ' seconds' + '<br/>Total: ' + (scoreCard.score * scoreCard.timer).toFixed(2));
     $('#complete').removeClass('d-none').addClass('d-grid'); // show high scores section
     
@@ -272,6 +267,7 @@ const adjustScore = (adjustment)=>{
             $('.adjusted').remove(); // make adjustment go away
         }, 350)
     }, 500);
+    setTimerDisplay();
 };
 
 const displayQuestion = () => {
@@ -304,7 +300,7 @@ const choiceSubmit = (event) => {
     $(choice).addClass((correct) ? 'border-info bg-success' : 'border-danger bg-warning')
     if(!correct) {
         wrongAnswers++
-        adjustScore(-5 * questionPosition);
+        adjustScore(-5 * (questionPosition + 1)); //get rekt 
         const multiChoice = (thisQuestion.type == questionType.multiChoice);
         const selectorString = (multiChoice ? '#multiChoice' : '#binaryChoice ') + ' div.answerCard';
         const choiceOptions = $(selectorString);
