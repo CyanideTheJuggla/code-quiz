@@ -1,4 +1,4 @@
-Code: https://github.com/CyanideTheJuggla/code-quiz \n
+Code: https://github.com/CyanideTheJuggla/code-quiz <br/>
 Deployment: https://cyanidethejuggla.github.io/code-quiz/ <br/>
 
 Screenshot: <img src="Assets/img/Capture.PNG" alt="Screenshot of Javascript Quiz"/>
