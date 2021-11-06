@@ -162,6 +162,33 @@ const generateHighScores = () => {
     currentHighScores = JSON.parse(localStorage.getItem('High Scores'));
 };
 
+const populateHighScores = () => {
+    highScoreBox.html('');
+    //add high score header
+    const highScoreHeader = '<div class="row justify-content-center my-1 bg-light-gradient" id="highScoreHeader">'
+        + '<div class="col-2 card p-5 align-self-center border-end-0" style="border-radius: 8px 0 0 8px;">'
+            + 'Place </div>'
+        + '<div class="col-4 card p-5 align-self-center border-start-0 border-end-0 " style="border-radius: 0 0 0 0;">'
+            + 'Name </div>'
+        + '<div class="col-4 card p-5 align-self-center border-start-0 " style="border-radius: 0 8px 8px 0;">'
+            + 'Score </div></div>';
+    highScoreBox.append(highScoreHeader);
+
+    //add high score list
+    for (let j = 0; j < currentHighScores.length; j++) {
+        const element = currentHighScores[j];
+        const score = element.score;
+        highScoreBox.append('<div class="row justify-content-center">'
+            + '<div class="col-2 card p-5 align-self-center border-end-0" style="border-radius: 8px 0 0 8px;"> '
+                + (j + 1 ) + ': </div>'
+            + '<div class="col-4 card p-5 align-self-center border-start-0 border-end-0" style="border-radius: 0 0 0 0; overflow: visible; white-space: nowrap"> '
+                + element.name + '</div>'
+            + '<div class="col-4 card p-5 align-self-center border-start-0" style="border-radius: 0 8px 8px 0;"> ' 
+                + score + '</div></div>'
+        );
+    }
+};
+
 const setTimerDisplay = function () {
     $('#timerDisplay').html(scoreCard.timer.toFixed(1) + ' second' + ((scoreCard.timer != 1) ? 's' : '') + ' remaining');
 };
@@ -225,29 +252,7 @@ const end = () => {
     const newHighScores = JSON.stringify(currentHighScores);
     localStorage.setItem('High Scores', newHighScores); // store new high scores
 
-    //add high score header
-    const highScoreHeader = '<div class="row justify-content-center my-1 bg-light-gradient" id="highScoreHeader">'
-        + '<div class="col-2 card p-5 align-self-center border-end-0" style="border-radius: 8px 0 0 8px;">'
-            + 'Place </div>'
-        + '<div class="col-4 card p-5 align-self-center border-start-0 border-end-0 " style="border-radius: 0 0 0 0;">'
-            + 'Name </div>'
-        + '<div class="col-4 card p-5 align-self-center border-start-0 " style="border-radius: 0 8px 8px 0;">'
-            + 'Score </div></div>';
-    highScoreBox.append(highScoreHeader);
-
-    //add high score list
-    for (let j = 0; j < currentHighScores.length; j++) {
-        const element = currentHighScores[j];
-        const score = element.score;
-        highScoreBox.append('<div class="row justify-content-center">'
-            + '<div class="col-2 card p-5 align-self-center border-end-0" style="border-radius: 8px 0 0 8px;"> '
-                + (j + 1 ) + ': </div>'
-            + '<div class="col-4 card p-5 align-self-center border-start-0 border-end-0" style="border-radius: 0 0 0 0; overflow: visible; white-space: nowrap"> '
-                + element.name + '</div>'
-            + '<div class="col-4 card p-5 align-self-center border-start-0" style="border-radius: 0 8px 8px 0;"> ' 
-                + score + '</div></div>'
-        );
-    }
+    populateHighScores();
 
     $('#scoreDisplay').html("Points: " + scoreCard.score + '<br/>Time: ' + scoreCard.timer.toFixed(1)  //set player stats
         + ' seconds' + '<br/>Total: ' + (scoreCard.score * scoreCard.timer).toFixed(2));
@@ -344,7 +349,10 @@ const devSkip = () => {
 $(document).ready(() => {
     $('#StartQuiz').click(start)
     $('.answerCard').click(choiceSubmit);
-
+    $('#highScoreLink').click(()=>{
+        populateHighScores();
+        $('#complete').removeClass('d-none').addClass('d-grid'); // show high scores section
+    });
     currentHighScores = JSON.parse(localStorage.getItem('High Scores'));
     if(currentHighScores == undefined || currentHighScores == null ) generateHighScores();
 });
